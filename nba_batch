@@ -81,7 +81,7 @@ for y in years:
             temp_df3 = pd.concat([temp_df2, temp_df1], axis=1)
             df = pd.concat([df, temp_df3], axis=0)
 
-            # 📝 Log success
+            #  Log success
             logging.info(f' Finished scraping data for Year: {y}, Season: {s}. Rows extracted: {len(temp_df1)}')
             print(f'Finished scraping data for the {y} {s}')
 
