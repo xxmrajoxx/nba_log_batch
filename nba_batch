@@ -115,7 +115,7 @@ df.to_excel(file_name, index=False)
 The filename is timestamped, e.g., nba_player_data_20250511_142300.xlsx.************************'''
 
 #  **Completion Log**
-logging.info(f"🏁 Process completed! Total run time: {round((time.time() - begin_loop) / 60, 2)} minutes.")
+logging.info(f" Process completed! Total run time: {round((time.time() - begin_loop) / 60, 2)} minutes.")
 print(f'Process completed! Total run time: {round((time.time() - begin_loop) / 60, 2)} minutes.')
 
 '''************************Logs the completion of the entire process.
