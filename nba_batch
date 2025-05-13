@@ -82,18 +82,18 @@ for y in years:
             df = pd.concat([df, temp_df3], axis=0)
 
             # 📝 Log success
-            logging.info(f'✅ Finished scraping data for Year: {y}, Season: {s}. Rows extracted: {len(temp_df1)}')
+            logging.info(f' Finished scraping data for Year: {y}, Season: {s}. Rows extracted: {len(temp_df1)}')
             print(f'Finished scraping data for the {y} {s}')
 
             # Random delay
             lag = np.random.uniform(low=5, high=40)
             print(f'...waiting {round(lag, 1)} seconds')
-            logging.info(f'⏳ Waiting {round(lag, 1)} seconds before the next request.')
+            logging.info(f' Waiting {round(lag, 1)} seconds before the next request.')
             time.sleep(lag)
 
         except Exception as e:
-            logging.error(f"❌ Failed to extract data for Year: {y}, Season: {s}. Error: {e}")
-            print(f"⚠️ Error while processing {y} {s}. Check the log for details.")
+            logging.error(f" Failed to extract data for Year: {y}, Season: {s}. Error: {e}")
+            print(f" Error while processing {y} {s}. Check the log for details.")
 
 '''************************Loops through every year and every season type.
 For each combination:
