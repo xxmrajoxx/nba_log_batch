@@ -14,7 +14,7 @@ time: Provides time-related functions like delays (sleep()).
 numpy (np): Provides mathematical operations and random number generation.
 logging: Built-in Python module for logging events (like errors or progress).
 os: Interacts with the operating system (e.g., creating directories).
-datetime: Used to format dates and timestamps. ''''''''''''''''''
+datetime: Used to format dates and timestamps. ************************'''
 
 #  **Setup Logging**
 if not os.path.exists('Logs'):
@@ -39,7 +39,7 @@ Configures the logging system:
     level: Logs everything from INFO and above.
     format: Specifies the format of each log line (timestamp, level, message).
     datefmt: Formats the timestamp as YYYY-MM-DD HH:MM:SS.
-Logs the start of the data extraction.''''''''''''''''''
+Logs the start of the data extraction.************************'''
 
 #  **Initial Setup**
 test_url = 'https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=PerGame&Scope=S&Season=2024-25&SeasonType=Playoffs&StatCategory=PTS'
