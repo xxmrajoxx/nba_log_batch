@@ -1,0 +1,125 @@
+import pandas as pd
+import requests
+
+pd.set_option('display.max_columns', None)  # Display all columns
+import time
+import numpy as np
+import logging
+import os
+from datetime import datetime
+
+'''************************pandas (pd): Used for data manipulation and creating DataFrames.
+requests: Makes HTTP requests to APIs.
+time: Provides time-related functions like delays (sleep()).
+numpy (np): Provides mathematical operations and random number generation.
+logging: Built-in Python module for logging events (like errors or progress).
+os: Interacts with the operating system (e.g., creating directories).
+datetime: Used to format dates and timestamps. ''''''''''''''''''
+
+#  **Setup Logging**
+if not os.path.exists('Logs'):
+    os.makedirs('Logs')
+
+# Include date and timestamp in log file name
+log_filename = datetime.now().strftime('nba_data_extraction_%Y%m%d_%H%M%S.log')
+
+logging.basicConfig(
+    filename=f'Logs/{log_filename}',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logging.info("NBA Data Extraction Started.")
+
+'''************************Checks if a folder called Logs exists. If not, it creates it.
+Generates a timestamped log filename, e.g., nba_data_extraction_20250511_142300.log.
+Configures the logging system:
+    filename: Saves logs to the Logs folder.
+    level: Logs everything from INFO and above.
+    format: Specifies the format of each log line (timestamp, level, message).
+    datefmt: Formats the timestamp as YYYY-MM-DD HH:MM:SS.
+Logs the start of the data extraction.''''''''''''''''''
+
+#  **Initial Setup**
+test_url = 'https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=PerGame&Scope=S&Season=2024-25&SeasonType=Playoffs&StatCategory=PTS'
+r = requests.get(url=test_url).json()
+table_headers = r['resultSet']['headers']
+df_cols = ['Year', 'Season_type'] + table_headers
+df = pd.DataFrame(columns=df_cols)
+season_types = ['Regular%20Season', 'Playoffs']
+years = ['2012-13', '2013-14', '2014-15', '2015-16', '2016-17',
+         '2017-18', '2018-19', '2019-20', '2020-21', '2021-22',
+         '2022-23', '2023-24', '2024-25']
+
+begin_loop = time.time()
+
+'''************************Makes an initial request to the NBA API to get the headers (column names).
+table_headers: Stores the column headers like Player Name, Team, PTS, etc.
+df_cols: Adds Year and Season_type as additional columns.
+df: Creates an empty DataFrame with the column names.
+season_types: Lists the two types of seasons we want: Regular Season and Playoffs.
+years: Lists all the seasons from 2012-13 to 2024-25.
+begin_loop: Records the start time to calculate the total time later.************************'''
+
+#  **Loop Through Years and Seasons**
+for y in years:
+    for s in season_types:
+        try:
+            logging.info(f'Starting data extraction for Year: {y}, Season: {s}.')
+            api_url = f'https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=PerGame&Scope=S&Season={y}&SeasonType={s}&StatCategory=PTS'
+            r = requests.get(url=api_url).json()
+
+            # DataFrames for combining
+            temp_df1 = pd.DataFrame(r['resultSet']['rowSet'], columns=table_headers)
+            temp_df2 = pd.DataFrame({
+                'Year': [y for _ in range(len(temp_df1))],
+                'Season_type': [s for _ in range(len(temp_df1))]
+            })
+
+            # Concatenate the metadata with the main data
+            temp_df3 = pd.concat([temp_df2, temp_df1], axis=1)
+            df = pd.concat([df, temp_df3], axis=0)
+
+            # 📝 Log success
+            logging.info(f'✅ Finished scraping data for Year: {y}, Season: {s}. Rows extracted: {len(temp_df1)}')
+            print(f'Finished scraping data for the {y} {s}')
+
+            # Random delay
+            lag = np.random.uniform(low=5, high=40)
+            print(f'...waiting {round(lag, 1)} seconds')
+            logging.info(f'⏳ Waiting {round(lag, 1)} seconds before the next request.')
+            time.sleep(lag)
+
+        except Exception as e:
+            logging.error(f"❌ Failed to extract data for Year: {y}, Season: {s}. Error: {e}")
+            print(f"⚠️ Error while processing {y} {s}. Check the log for details.")
+
+'''************************Loops through every year and every season type.
+For each combination:
+    Sends a request to the API to get the data.
+    Creates two DataFrames:
+        temp_df1: The main stats data for players.
+        temp_df2: Extra columns for the year and season type.
+    Concatenates these DataFrames side by side (axis=1) → temp_df3.
+    Appends temp_df3 to the main DataFrame df.
+    Logs the success and prints it to the console.
+Waits for a random time (between 5 and 40 seconds) before the next request to avoid being blocked by the API.
+If there’s an error (e.g., connection failure), it logs the error and prints a warning.************************'''
+
+#  **Save to Excel with Timestamp**
+file_name = f'nba_player_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+df.to_excel(file_name, index=False)
+
+'''************************Exports the DataFrame df to an Excel file.
+The filename is timestamped, e.g., nba_player_data_20250511_142300.xlsx.************************'''
+
+#  **Completion Log**
+logging.info(f"🏁 Process completed! Total run time: {round((time.time() - begin_loop) / 60, 2)} minutes.")
+print(f'Process completed! Total run time: {round((time.time() - begin_loop) / 60, 2)} minutes.')
+
+'''************************Logs the completion of the entire process.
+Calculates the total time taken in minutes.
+Displays a success message in the console.************************'''
+
+
